@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter, Poppins } from "next/font/google";
+import WhatsAppWidget from '../components/WhatsAppWidget';
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${inter.variable} ${poppins.variable} ${serif.variable} scroll-smooth`}>
       <body className="bg-paper font-sans text-dark antialiased selection:bg-brand selection:text-black">
         {children}
+        <WhatsAppWidget />
         <div aria-hidden className="grain pointer-events-none fixed inset-0 z-[100] opacity-5" />
       </body>
     </html>

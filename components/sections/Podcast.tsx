@@ -1,9 +1,8 @@
-
 /* eslint-disable @next/next/no-img-element */
 import { Reveal } from "@/components/Motion";
 
 const platforms = [
-  { name: "YouTube", href: "#" },
+  { name: "YouTube", href: "https://www.youtube.com/@AskDrEttang/" },
   { name: "Spotify", href: "#" },
 ];
 
@@ -56,6 +55,8 @@ export default function Podcast() {
                   <a
                     key={platform.name}
                     href={platform.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="group inline-flex items-center gap-2 text-xs font-medium text-white/80 transition-colors duration-300 hover:text-[#FAD02C]"
                   >
                     {platform.name}
@@ -101,7 +102,9 @@ export default function Podcast() {
               </div>
 
               <a
-                href="#"
+                href="https://www.youtube.com/@AskDrEttang/" // ✅ Updated Link Here
+                target="_blank" 
+                rel="noopener noreferrer"
                 className="group/button inline-flex min-h-[52px] items-center gap-6 bg-[#FAD02C] px-6 py-4 text-[10px] font-bold uppercase tracking-[0.14em] text-[#173B57] transition-all duration-300 hover:bg-white"
               >
                 Watch the podcast
