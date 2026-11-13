@@ -73,7 +73,7 @@ export default function Nav() {
                 Call us
               </span>
               <span className="mt-1 text-[12px] font-medium text-white/80">
-                +234 000 000 0000
+                +27 64 559 6158
               </span>
             </a>
 
