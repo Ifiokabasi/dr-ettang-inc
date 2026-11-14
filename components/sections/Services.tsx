@@ -1,6 +1,6 @@
 
 import { Item, Reveal, Stagger } from "@/components/Motion";
-import { services, lorem } from "@/components/data";
+import { services} from "@/components/data";
 import Eyebrow from "@/components/ui/Eyebrow";
 import { Arrow, Icon } from "@/components/ui/Icons";
 
@@ -61,7 +61,7 @@ export default function Services() {
 
                 {/* DESCRIPTION */}
                 <p className="mb-8 max-w-[360px] text-[14px] leading-[1.9] text-black/55">
-                  {lorem}
+                  {s.desc}
                 </p>
 
                 {/* LINK */}

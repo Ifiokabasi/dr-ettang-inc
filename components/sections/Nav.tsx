@@ -66,14 +66,14 @@ export default function Nav() {
           {/* Desktop CTA */}
           <div className="hidden items-center gap-3 md:flex">
             <a
-              href="tel:+2340000000000"
+              href="tel:+27784851545"
               className="hidden xl:flex flex-col text-right leading-tight"
             >
               <span className="text-[9px] uppercase tracking-[0.18em] text-white/40">
                 Call us
               </span>
               <span className="mt-1 text-[12px] font-medium text-white/80">
-                +27 64 559 6158
+                +27 78 485 1545
               </span>
             </a>
 
