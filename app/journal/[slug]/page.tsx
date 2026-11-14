@@ -37,6 +37,31 @@ export async function generateMetadata({
   };
 }
 
+// ✅ Define custom components for Portable Text
+const components = {
+  block: {
+    normal: ({ children }: { children?: React.ReactNode }) => (
+      <p className="mb-6 text-[16px] leading-[1.9] text-black/70">{children}</p>
+    ),
+    h1: ({ children }: { children?: React.ReactNode }) => (
+      <h1 className="mt-10 mb-4 font-display text-3xl font-bold text-black">{children}</h1>
+    ),
+    h2: ({ children }: { children?: React.ReactNode }) => (
+      <h2 className="mt-8 mb-3 font-display text-2xl font-bold text-black">{children}</h2>
+    ),
+    h3: ({ children }: { children?: React.ReactNode }) => (
+      <h3 className="mt-6 mb-2 font-display text-xl font-semibold text-black">{children}</h3>
+    ),
+    blockquote: ({ children }: { children?: React.ReactNode }) => (
+      <blockquote className="my-6 border-l-4 border-[#90ADC6] pl-4 italic text-black/60">
+        {children}
+      </blockquote>
+    ),
+  },
+  // ✅ This ensures Shift+Enter line breaks render as <br />
+  hardBreak: () => <br />,
+};
+
 export default async function JournalPostPage({
   params,
 }: {
@@ -76,8 +101,9 @@ export default async function JournalPostPage({
       )}
 
       <div className="prose mt-8">
-        <PortableText value={post.body} />
+        {/* ✅ Pass the components prop */}
+        <PortableText value={post.body} components={components} />
       </div>
     </article>
   );
-} 
+}
