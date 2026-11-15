@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     }
 
     const { data, error } = await resend.emails.send({
-      from: 'Contact <onboarding@resend.dev>', // Replace with verified domain in production
+      from: 'Dr Ettang <hello@drettang.com>', // Replace with verified domain in production
       to: ['dr.ettang@gmail.com'], // 
       subject: `New Contact Request from ${body.name}`,
       html: `

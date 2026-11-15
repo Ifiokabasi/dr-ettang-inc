@@ -14,7 +14,7 @@ export async function POST(request: Request) {
 
     // Send notification to you
     const { error } = await resend.emails.send({
-      from: 'Newsletter <onboarding@resend.dev>',
+      from: 'Newsletter <newsletter@drettang.com>',
       to: ['dr.ettang@gmail.com'],
       subject: 'New Newsletter Subscriber',
       html: `<p><strong>Email:</strong> ${email}</p>`,
