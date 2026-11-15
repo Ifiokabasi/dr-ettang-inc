@@ -13,33 +13,138 @@ const shell = "mb-20 rounded-[28px] border border-white/70 bg-white/70 shadow-li
 export function BookingCard() {
   const [step, setStep] = useState(0);
   const [done, setDone] = useState(false);
-  if (done) return <div role="status" className={`${shell} p-8`}><h3 className="mb-2 text-[32px] font-semibold text-ink">Request sent</h3><p>Thank you. We will confirm your appointment shortly.</p></div>;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // If we are not on the final step, just advance
+    if (step < 2) {
+      setStep(step + 1);
+      return;
+    }
+
+    // We are on the final step. Gather all data from the form.
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      service: formData.get('svc'),
+      location: formData.get('loc'),
+      date: formData.get('date'),
+      time: formData.get('time'),
+      name: formData.get('bn'),
+      email: formData.get('be'),
+      phone: formData.get('bp'),
+    };
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to submit');
+      }
+
+      setDone(true);
+    } catch (error) {
+      console.error(error);
+      alert('Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (done) {
+    return (
+      <div role="status" className={`${shell} p-8`}>
+        <h3 className="mb-2 text-[32px] font-semibold text-ink">Request sent</h3>
+        <p>Thank you. We will confirm your appointment shortly.</p>
+      </div>
+    );
+  }
+
   return (
     <div className={`${shell} grid gap-7 px-7 pb-9 pt-12 md:grid-cols-[230px_1fr]`}>
       <div className="grid content-start gap-[26px] md:border-r md:border-[#999] md:pr-6" role="tablist">
         {STEPS.map((s, i) => (
-          <button key={s} role="tab" aria-current={step === i} onClick={() => setStep(i)}
-            className={`flex h-[70px] items-center rounded-2xl px-[17px] text-left font-display text-base transition ${step === i ? "bg-ink text-white" : "bg-black/5 hover:bg-black/10"}`}>{s}</button>
+          <button
+            key={s}
+            role="tab"
+            aria-current={step === i}
+            onClick={() => setStep(i)}
+            className={`flex h-[70px] items-center rounded-2xl px-[17px] text-left font-display text-base transition ${
+              step === i ? 'bg-ink text-white' : 'bg-black/5 hover:bg-black/10'
+            }`}
+          >
+            {s}
+          </button>
         ))}
       </div>
-      <form onSubmit={(e) => { e.preventDefault(); step < 2 ? setStep(step + 1) : setDone(true); }}>
-        <h3 className="mb-6 border-b border-[#999] pb-3 text-[32px] font-semibold text-ink">{STEPS[step]}</h3>
-        {step === 0 && (<>
-          <label htmlFor="svc" className={label}>Service:</label>
-          <select id="svc" className={input} required defaultValue=""><option value="" disabled>Select Service</option>{SERVICES.map((s) => <option key={s}>{s}</option>)}</select>
-          <label htmlFor="loc" className={label}>Location:</label>
-          <select id="loc" className={input} required defaultValue=""><option value="" disabled>Select Location</option>{LOCATIONS.map((s) => <option key={s}>{s}</option>)}</select>
-        </>)}
-        {step === 1 && (<>
-          <label htmlFor="date" className={label}>Preferred date:</label><input id="date" type="date" className={input} required />
-          <label htmlFor="time" className={label}>Preferred time:</label><input id="time" type="time" className={input} required />
-        </>)}
-        {step === 2 && (<>
-          <label htmlFor="bn" className={label}>Full name:</label><input id="bn" className={input} required />
-          <label htmlFor="be" className={label}>Email:</label><input id="be" type="email" className={input} required />
-          <label htmlFor="bp" className={label}>Phone:</label><input id="bp" type="tel" className={input} />
-        </>)}
-        <Button variant="dark" type="submit" className="mt-[30px] w-full justify-center">{step < 2 ? "Continue" : "Request appointment"}</Button>
+
+      <form onSubmit={handleSubmit}>
+        <h3 className="mb-6 border-b border-[#999] pb-3 text-[32px] font-semibold text-ink">
+          {STEPS[step]}
+        </h3>
+
+        {/* Step 1: Service & Location */}
+        {step === 0 && (
+          <>
+            <label htmlFor="svc" className={label}>Service:</label>
+            <select id="svc" name="svc" className={input} required defaultValue="">
+              <option value="" disabled>Select Service</option>
+              {SERVICES.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+
+            <label htmlFor="loc" className={label}>Location:</label>
+            <select id="loc" name="loc" className={input} required defaultValue="">
+              <option value="" disabled>Select Location</option>
+              {LOCATIONS.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </>
+        )}
+
+        {/* Step 2: Preferred Time */}
+        {step === 1 && (
+          <>
+            <label htmlFor="date" className={label}>Preferred date:</label>
+            <input id="date" name="date" type="date" className={input} required />
+
+            <label htmlFor="time" className={label}>Preferred time:</label>
+            <input id="time" name="time" type="time" className={input} required />
+          </>
+        )}
+
+        {/* Step 3: Your Details */}
+        {step === 2 && (
+          <>
+            <label htmlFor="bn" className={label}>Full name:</label>
+            <input id="bn" name="bn" className={input} required />
+
+            <label htmlFor="be" className={label}>Email:</label>
+            <input id="be" name="be" type="email" className={input} required />
+
+            <label htmlFor="bp" className={label}>Phone:</label>
+            <input id="bp" name="bp" type="tel" className={input} />
+          </>
+        )}
+
+        <Button
+          variant="dark"
+          type="submit"
+          className="mt-[30px] w-full justify-center"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Sending...' : step < 2 ? 'Continue' : 'Request appointment'}
+        </Button>
       </form>
     </div>
   );
@@ -47,12 +152,45 @@ export function BookingCard() {
 
 export function NewsletterForm() {
   const [ok, setOk] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('nl');
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (!response.ok) throw new Error('Failed');
+      setOk(true);
+    } catch {
+      alert('Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (ok) return <p role="status">You are subscribed. Thank you.</p>;
+
   return (
-    <form onSubmit={(e) => { e.preventDefault(); setOk(true); }} className="flex flex-wrap gap-3">
+    <form onSubmit={handleSubmit} className="flex flex-wrap gap-3">
       <label htmlFor="nl" className="sr-only">Email address</label>
-      <input id="nl" type="email" required placeholder="Your email address" className="h-[54px] min-w-[220px] flex-1 rounded-xl border border-[#555] bg-[#333] px-3.5 text-white outline-none transition focus:ring-4 focus:ring-brand/30" />
-      <Button variant="outline" type="submit">Sign Up</Button>
+      <input
+        id="nl"
+        name="nl"
+        type="email"
+        required
+        placeholder="Your email address"
+        className="h-[54px] min-w-[220px] flex-1 rounded-xl border border-[#555] bg-[#333] px-3.5 text-white outline-none transition focus:ring-4 focus:ring-brand/30"
+      />
+      <Button variant="outline" type="submit" disabled={isSubmitting}>
+        {isSubmitting ? 'Signing up...' : 'Sign Up'}
+      </Button>
     </form>
   );
 }
@@ -63,19 +201,82 @@ const Req = () => <b className="text-[#eb5454]">*</b>;
 
 export function ContactForm() {
   const [ok, setOk] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      name: formData.get('cn'),
+      email: formData.get('ce'),
+      reason: formData.get('cr'),
+      message: formData.get('cm'),
+      newsletter: formData.get('newsletter') === 'on',
+    };
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to submit');
+      }
+
+      setOk(true);
+    } catch (error) {
+      console.error(error);
+      alert('Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (ok) return <p role="status">Thank you. We will get back to you soon.</p>;
+
   return (
-    <form onSubmit={(e) => { e.preventDefault(); setOk(true); }}>
+    <form onSubmit={handleSubmit}>
       <div className="grid gap-6 sm:grid-cols-2">
-        <div><label htmlFor="cn" className={cLabel}>Name <Req /></label><input id="cn" className={cInput} required /></div>
-        <div><label htmlFor="ce" className={cLabel}>Email <Req /></label><input id="ce" type="email" className={cInput} required /></div>
+        <div>
+          <label htmlFor="cn" className={cLabel}>Name <Req /></label>
+          <input id="cn" name="cn" className={cInput} required />
+        </div>
+        <div>
+          <label htmlFor="ce" className={cLabel}>Email <Req /></label>
+          <input id="ce" name="ce" type="email" className={cInput} required />
+        </div>
       </div>
-      <label htmlFor="cr" className={cLabel}>What’s your reason for contacting us? <Req /></label>
-      <select id="cr" className={cInput} required defaultValue=""><option value="" disabled>Choose One</option><option>Book a consultation</option><option>Home visit</option><option>Telehealth</option><option>Other</option></select>
+
+      <label htmlFor="cr" className={cLabel}>What's your reason for contacting us? <Req /></label>
+      <select id="cr" name="cr" className={cInput} required defaultValue="">
+        <option value="" disabled>Choose One</option>
+        <option>Book a consultation</option>
+        <option>Home visit</option>
+        <option>Telehealth</option>
+        <option>Other</option>
+      </select>
+
       <label htmlFor="cm" className={cLabel}>Tell Us More <Req /></label>
-      <textarea id="cm" required className={`${cInput} h-[140px] resize-y py-3.5`} />
-      <label className="mt-5 flex items-center gap-2.5 text-[15px] font-bold"><input type="checkbox" className="accent-brand" /> Updates: Subscribe to our Newsletter</label>
-      <Button type="submit" className="mt-8 h-[72px] w-full justify-center font-black tracking-[.08em]">CONNECT WITH US</Button>
+      <textarea id="cm" name="cm" required className={`${cInput} h-[140px] resize-y py-3.5`} />
+
+      <label className="mt-5 flex items-center gap-2.5 text-[15px] font-bold">
+        <input type="checkbox" name="newsletter" className="accent-brand" />
+        Updates: Subscribe to our Newsletter
+      </label>
+
+      <Button
+        type="submit"
+        className="mt-8 h-[72px] w-full justify-center font-black tracking-[.08em]"
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? 'SENDING...' : 'CONNECT WITH US'}
+      </Button>
     </form>
   );
 }
